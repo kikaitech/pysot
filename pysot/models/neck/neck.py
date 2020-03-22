@@ -5,8 +5,10 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import torch
 import torch.nn as nn
 
+from typing import List
 
 class AdjustLayer(nn.Module):
     def __init__(self, in_channels, out_channels, center_size=7):
@@ -41,12 +43,9 @@ class AdjustAllLayer(nn.Module):
                                             out_channels[i],
                                             center_size))
 
-    def forward(self, features):
-        if self.num == 1:
-            return self.downsample(features)
-        else:
-            out = []
-            for i in range(self.num):
-                adj_layer = getattr(self, 'downsample'+str(i+2))
-                out.append(adj_layer(features[i]))
-            return out
+    def forward(self, features : List[torch.Tensor]):
+        out = []
+        out.append(getattr(self, 'downsample2')(features[0]))
+        out.append(getattr(self, 'downsample3')(features[1]))
+        out.append(getattr(self, 'downsample4')(features[2]))
+        return out
