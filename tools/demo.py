@@ -118,7 +118,6 @@ def main():
             cv2.putText(frame, str(count / (time.time() - start_time)), (25, 25), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 1, cv2.LINE_AA)
             cv2.imshow(video_name, frame)
             cv2.waitKey(1)
-            first_frame = True
 
 
 if __name__ == '__main__':

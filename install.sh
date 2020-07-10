@@ -22,8 +22,7 @@ echo "***** install numpy pytorch opencv *****"
 # numpy
 conda install -y numpy
 # pytorch
-# pytorch with cuda80/cuda90 is tested
-conda install -y pytorch=0.4.1 torchvision cuda90 -c pytorch
+conda install pytorch torchvision cudatoolkit=10.2 -c pytorch
 # opencv
 pip install opencv-python
 # tensorboardX
