@@ -10,12 +10,13 @@ import cv2
 import torch
 import numpy as np
 from glob import glob
+import time
 
 from pysot.core.config import cfg
 from pysot.models.model_builder import ModelBuilder
 from pysot.tracker.tracker_builder import build_tracker
 
-torch.set_num_threads(1)
+torch.set_num_threads(8)
 
 parser = argparse.ArgumentParser(description='tracking demo')
 parser.add_argument('--config', type=str, help='config file')
@@ -66,7 +67,7 @@ def main():
 
     # load model
     model.load_state_dict(torch.load(args.snapshot,
-        map_location=lambda storage, loc: storage.cpu()))
+        map_location=lambda storage, loc: storage.cuda()))
     model.eval().to(device)
 
     # build tracker
@@ -86,7 +87,10 @@ def main():
                 exit()
             tracker.init(frame, init_rect)
             first_frame = False
+            start_time = time.time()
+            count = 0
         else:
+            count += 1
             outputs = tracker.track(frame)
             if 'polygon' in outputs:
                 polygon = np.array(outputs['polygon']).astype(np.int32)
@@ -101,8 +105,9 @@ def main():
                 cv2.rectangle(frame, (bbox[0], bbox[1]),
                               (bbox[0]+bbox[2], bbox[1]+bbox[3]),
                               (0, 255, 0), 3)
+            cv2.putText(frame, str(count / (time.time() - start_time)), (25, 25), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 1, cv2.LINE_AA)
             cv2.imshow(video_name, frame)
-            cv2.waitKey(40)
+            cv2.waitKey(1)
 
 
 if __name__ == '__main__':
