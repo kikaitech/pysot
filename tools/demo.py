@@ -70,6 +70,25 @@ def main():
         map_location=lambda storage, loc: storage.cuda()))
     model.eval().to(device)
 
+    # for `siammask_r50_l3`
+    torch.jit.script(getattr(model.backbone, 'conv1')).save('siammask_backbone_resnet_conv1.pt')
+    torch.jit.script(getattr(model.backbone, 'bn1')).save('siammask_backbone_resnet_bn1.pt')
+    backbone_layer_cnt = 1
+    for i in range(3):
+        for j in range(6):
+            idx1 = str(i + 1)
+            idx2 = str(j)
+            try:
+                torch.jit.script(getattr(getattr(model.backbone, 'layer' + idx1), idx2)).save('siammask_backbone_resnet_layer' + str(backbone_layer_cnt) + '.pt')
+                backbone_layer_cnt += 1
+            except:
+                break
+    torch.jit.script(model.neck).save('siammask_neck_adjust_all_layer.pt')
+    torch.jit.script(model.rpn_head).save('siammask_rpn_head.pt')
+    torch.jit.script(model.mask_head).save('siammask_mask_head.pt')
+    torch.jit.script(model.refine_head).save('siammask_refine_head.pt')
+    return
+
     # build tracker
     tracker = build_tracker(model)
 
